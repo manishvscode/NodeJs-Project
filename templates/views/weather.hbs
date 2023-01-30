@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {{>headerlinks}}
+</head>
+<body>
+
+ {{>navbar}}
+
+  <div class="container-fluid">
+        <div class="row">
+            <div class="col-sm-12 col-12 mb-3 mx-auto">
+     
+     {{!-- <div class="container-fluid mt-3 main_header">
+        <div class="row">
+            <div class="col-md-10 col-12 mx-auto"> --}}
+               <div class="main_content">
+                <form class="temp_form">
+                    <input type="text" id="cityName" placeholder="Enter City Name" autocapitalize="off">
+                    <input type="submit"  value="search" id="submitBtn">
+                </form>
+
+               </div>
+                <div class="tempInformation">
+                    <div class="top_layer">
+                        <p id="day">Tue</p>
+                        <p id="today_date">19 Jan</p>
+                    </div>
+                    <div class="main_layer">
+                        <p id="city_name">Get Output</p>
+                        <div class="middle_layer data_hide">
+                            <p id="temp"> <span id="temp_real_val">0</span> <sup>o</sup>C</p>
+                            <p id="temp_status"><i class="fa fa-cloud"></i></p>
+                        </div>
+                    </div>
+                </div>
+
+
+            </div>
+        </div>
+    </div>
+
+     <!-- footer code  -->
+    <footer>
+        <p>created with @manishKumar</p>
+    </footer>
+
+
+    {{!-- javascript code  --}}
+<script>
+const submitBtn = document.getElementById('submitBtn');
+const cityName = document.getElementById('cityName');
+const city_name = document.getElementById('city_name');
+const temp_real_val = document.getElementById('temp_real_val');
+const temp_status = document.getElementById('temp_status');
+const datahide = document.querySelector('.middle_layer');
+
+
+const getInfo = async(event) =>{
+    //to hold the input or stop the refreshing page due to form tag
+    event.preventDefault();
+    let cityVal = cityName.value;
+
+    if(cityVal===''){
+        city_name.innerText = "Please enter the name before search🙏"
+        datahide.classList.add('data_hide');
+    }else{
+        try{
+            let url  = `https://api.openweathermap.org/data/2.5/weather?q=${cityVal}&appid=297d9d5addde21e229856ec9d56029c0`;
+        const response = await fetch(url);
+        const data = await response.json();
+        //console.log(data);
+        const arrData  = [data];
+
+        city_name.innerText =  `${arrData[0].name}, ${arrData[0].sys.country}`;
+        const K = arrData[0].main.temp;
+        const cel = K-273.15;
+       
+        temp_real_val.innerText = cel.toFixed(2);
+
+        const tempMood = arrData[0].weather[0].main;
+        if(tempMood==='Clouds'){
+            temp_status.innerHTML = '<i class="fa fa-cloud">';
+        }else{
+            temp_status.innerHTML = arrData[0].weather[0].main;
+        }
+
+        datahide.classList.remove('data_hide');
+
+        }catch{
+            city_name.innerText = "Please enter the name properly🙏";
+            datahide.classList.add('data_hide');
+        }
+    }
+}
+submitBtn.addEventListener('click', getInfo);
+
+//find the today's date
+
+
+const d = new Date();
+const date  = d.getDate();
+
+const daylist = ['Sunday', 'Monday', 'Tueday', 'Wedday', 'Thuday', 'Friday', 'Satday'];
+const today = daylist[d.getDay()];
+
+const yyyy = d.getFullYear();
+
+document.getElementById('day').innerHTML = today;
+
+const month = d.getMonth();
+const monthlist = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+const thismonth = monthlist[month];
+const todate = `${date} ${thismonth}, ${yyyy}`
+document.getElementById('today_date').innerHTML = todate;
+</script>
+    
+</body>
+</html>
